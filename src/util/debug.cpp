@@ -1,4 +1,5 @@
 #include "color.h"
+#include "Vector3D.h"
 
 Color a;
 
@@ -15,7 +16,7 @@ struct node
 
 int main(void)
 {
-	Color::ColT t = 0.5;
+	Color::Col_T t = 0.5;
 	node tt;
 	int s = 11; 
 	tt = node(1, 1);

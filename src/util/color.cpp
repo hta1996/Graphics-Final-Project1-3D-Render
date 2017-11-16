@@ -11,12 +11,12 @@ Color& Color::operator += (const Color& k)
 	return *this;
 }
 
-Color Color::operator + (const Color::ColT& k) const
+Color Color::operator + (const Color::Col_T& k) const
 {
 	return Color(r + k, g + k, b + k);
 }
 
-Color& Color::operator += (const Color::ColT& k)
+Color& Color::operator += (const Color::Col_T& k)
 {
 	r += k, g += k, b += k;
 	return *this;
@@ -35,12 +35,12 @@ Color& Color::operator -= (const Color& k)
 	return *this;
 }
 
-Color Color::operator - (const Color::ColT& k) const
+Color Color::operator - (const Color::Col_T& k) const
 {
 	return Color(r - k, g - k, b - k);
 }
 
-Color& Color::operator -= (const Color::ColT& k)
+Color& Color::operator -= (const Color::Col_T& k)
 {
 	r -= k, g -= k, b -= k;
 	return *this;
@@ -59,12 +59,12 @@ Color& Color::operator *= (const Color& k)
 	return *this;
 }
 
-Color Color::operator * (const Color::ColT& k) const
+Color Color::operator * (const Color::Col_T& k) const
 {
 	return Color(r * k, g * k, b * k);
 }
 
-Color& Color::operator *= (const Color::ColT& k)
+Color& Color::operator *= (const Color::Col_T& k)
 {
 	r *= k, g *= k, b *= k;
 	return *this;
@@ -72,20 +72,25 @@ Color& Color::operator *= (const Color::ColT& k)
 
 
 
-Color Color::operator / (const Color::ColT& k) const
+Color Color::operator / (const Color::Col_T& k) const
 {
 	return Color(r / k, g / k, b / k);
 }
 
-Color& Color::operator /= (const Color::ColT& k)
+Color& Color::operator /= (const Color::Col_T& k)
 {
 	r /= k, g /= k, b /= k;
 	return *this;
 }
 
+Color Color::operator - (void) const { return Color(-r, -g, -b); }
 
 
-Color::ColT Color::mod2(void) const { return r * r + g * g + b * b;}
+
+Color::Col_T& Color::operator[] (int i) { return !i ? r : (i == 1 ? g : b); }
+const Color::Col_T Color::operator[] (int i) const { return !i ? r : (i == 1 ? g : b); }
+
+Color::Col_T Color::mod2(void) const { return r * r + g * g + b * b;}
 Color Color::inverse(void) const { return Color(1 - r, 1 - g, 1 - b); }
 
 Color Color::exp(void) const

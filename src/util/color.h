@@ -1,37 +1,42 @@
 #ifndef COLOR_H
 #define COLOR_H
 
-#include "const.h"
+#include "constant.h"
 
 struct Color
 {
-	//typedef float ColT;
-	typedef double ColT;
+	//typedef float Col_T;
+	typedef double Col_T;
 	
-	ColT r, g, b;
+	Col_T r, g, b;
 	
 	Color() : r(0), g(0), b(0) {}
-	Color(ColT r, ColT g, ColT b) : r(r), g(g), b(b) {}
+	Color(Col_T r, Col_T g, Col_T b) : r(r), g(g), b(b) {}
 	
 	Color operator + (const Color& k) const;
 	Color& operator += (const Color& k);
-	Color operator + (const ColT& k) const;
-	Color& operator += (const ColT& k);
+	Color operator + (const Col_T& k) const;
+	Color& operator += (const Col_T& k);
 	
 	Color operator - (const Color& k) const;
 	Color& operator -= (const Color& k);
-	Color operator - (const ColT& k) const;
-	Color& operator -= (const ColT& k);
+	Color operator - (const Col_T& k) const;
+	Color& operator -= (const Col_T& k);
 		
 	Color operator * (const Color& k) const;
 	Color& operator *= (const Color& k);
-	Color operator * (const ColT& k) const;
-	Color& operator *= (const ColT& k);
+	Color operator * (const Col_T& k) const;
+	Color& operator *= (const Col_T& k);
 		
-	Color operator / (const ColT& k) const;
-	Color& operator /= (const ColT& k);
+	Color operator / (const Col_T& k) const;
+	Color& operator /= (const Col_T& k);
+	
+	Color operator - (void) const;
+	
+	Col_T& operator[] (int i) ;	
+	const Col_T operator[] (int i) const;
 
-	ColT mod2(void) const; //颜色模长
+	Col_T mod2(void) const; //颜色模长的平方 
 	
 	Color inverse(void) const; //反颜色 
 	
@@ -39,7 +44,7 @@ struct Color
 	
 	Color normal(void) const; //约束到[0,1]之间
 	
-	ColT power(void) const; //能量 
+	Col_T power(void) const; //能量 
 	
 };
 

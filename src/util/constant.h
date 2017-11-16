@@ -1,16 +1,18 @@
 #ifndef CONST_H
 #define CONST_H
-
 #include <cmath>
 #include <cstdlib>
 #include <algorithm>
 #include <iostream>
 
-typedef unsigned long long uint64;
-typedef long long int64;
-
-namespace Const
+namespace Constant
 {
+	typedef unsigned long long uint64;
+	typedef long long int64;
+	typedef double color_type;
+	typedef double coordinate_type;
+	typedef double other_data;
+
 	const double EPS = 1e-6;
 	const double PI = std::acos(-1.0);
 	
