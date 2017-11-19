@@ -9,8 +9,7 @@ namespace Constant
 {
 	typedef unsigned long long uint64;
 	typedef long long int64;
-	typedef double color_type;
-	typedef double coordinate_type;
+	typedef double data_type;
 	typedef double other_data;
 
 	const double EPS = 1e-6;

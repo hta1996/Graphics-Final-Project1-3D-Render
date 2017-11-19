@@ -9,6 +9,7 @@ struct Color
 	typedef double Col_T;
 	
 	Col_T r, g, b;
+	const Col_T &x = r, &y = g, &z = b;
 	
 	Color() : r(0), g(0), b(0) {}
 	Color(Col_T r, Col_T g, Col_T b) : r(r), g(g), b(b) {}
@@ -23,7 +24,7 @@ struct Color
 	Color operator - (const Col_T& k) const;
 	Color& operator -= (const Col_T& k);
 		
-	Color operator * (const Color& k) const;
+	virtual Color operator * (const Color& k) const;
 	Color& operator *= (const Color& k);
 	Color operator * (const Col_T& k) const;
 	Color& operator *= (const Col_T& k);
