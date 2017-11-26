@@ -10,7 +10,7 @@ struct Ray //…‰œﬂ¿‡
 	Vec3D o, d;
 	
 	Ray(): o(), d() {}
-	Ray(const Vec3D& o, const Vec3D& dir): o(o), d(dir) {}
+	Ray(const Vec3D& o, const Vec3D& dir): o(o), d(dir.unit()) {}
 	Vec3D get(const data_type &t) const { return o + d * t; }
 	Ray unit(void) const { return Ray(o, d.unit()); }
 	void unitize(void) { d.unitize(); }	

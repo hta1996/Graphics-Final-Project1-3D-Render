@@ -3,6 +3,7 @@
 
 #include "util/constant.h"
 #include "collision.h"
+#include "light/light.h"
 
 class Object //各种物体的基类
 {
@@ -12,7 +13,7 @@ public:
 
     }
 
-    uint64 getI(void) const { return identifier; }
+    uint64 getI(void) const { return id; }
     //const Material* getM() const { return material; }
 /*
     virtual std::string getType() const = 0;
@@ -40,10 +41,9 @@ protected:
     //Object(const Json::Value& object);
 
     //const Material* material;  // 材料属性
-    uint64 identifier;         // 标识符
+    uint64 id;         // 标识符
 
 private:
-    bool has_material;
 };
 
 #endif

@@ -1,1 +1,3 @@
-#include "light/light.h"
+#include "light.h"
+#include "pointlight.h"
+#include "arealight.h"

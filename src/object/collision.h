@@ -8,40 +8,24 @@ class Object;
 
 struct Collision
 {
-    /*
-    Collision():
     
+    Collision() : t(1E8) {} // 不相交
 
+    Collision(const Ray& r, data_type t, const Light *l);// 与光源相交
 
-    // 不相交
-    Collision();
+    const Object* o;     // 相交的物体
+    const Light* l;      // 相交的光源
 
-    // 与物体相交
-    Collision(const Ray& ray, double t, const Vector3& n, const Object* obj, bool in, uint64 idf = 0);
+    Ray r;               // 射线
+    Vec3D p, n;          // 交点
+    data_type t, u, v;   // 交点对应的射线参数，参数曲面
+    bool in;             // 射线起点是否在物体内部（可选）
+    uint64 id;           // 相交物体标识符
 
-    // 与物体相交，包含参数
-    Collision(const Ray& ray, double t, double u, double v, const Vector3& n, const Object* obj, bool in, uint64 idf = 0);
-
-    // 与光源相交
-    Collision(const Ray& ray, double t, const Light* l);
-
-    const Object* object;     // 相交的物体
-    const Light* light;       // 相交的光源
-    Ray ray;                  // 射线
-    Vector3 p, n;             // 交点，交点处物体的法向量(只对与物体相交有效)，自动单位化
-    double dist;              // 交点对应的射线参数，ray_d 单位化后就是交点与射线起点间的距离
-    double u, v;              // 如果是参数曲面，保存交点处的参数
-    bool is_internal;         // 射线起点是否在物体内部（可选）
-    uint64 object_identifier; // 相交物体标识符
-
-    // 是否有交点
-    bool isHit() const { return dist < 1e9; }
-
-    // 是否是与物体相交
-    bool atObject() const { return object != nullptr; }
-
-    // 是否是与光源相交
-    bool atLight() const { return light != nullptr; }*/
+    
+    bool isHit(void) const { return t <= 5E7; }      // 是否有交点
+    bool ato(void) const { return o != nullptr; }
+    bool atl(void) const { return l != nullptr; }
 };
 
 #endif
