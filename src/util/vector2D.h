@@ -2,11 +2,10 @@
 #define vector3D_H
 
 #include "constant.h"
-//#include "Vector2D.h"
 
 struct Vec2D
 {
-	typedef Constant::data_type Coor_T;
+	typedef data_type Coor_T;
 	
 	Coor_T x, y;
 	
@@ -36,15 +35,19 @@ struct Vec2D
 	Coor_T& operator[] (int i) { return i == 1 ? y : x; }	
 	const Coor_T operator[] (int i) const { return i ? y : x; }
 
-	Coor_T mod2(void) const { return x * x + y * y;} //向量模长的平方
+	Coor_T len2(void) const { return x * x + y * y;} //向量模长的平方
 	
-	Coor_T mod(void) const { return std::sqrt(x * x + y * y);} //向量模长
+	Coor_T len(void) const { return std::sqrt(x * x + y * y);} //向量模长
 	
 	Coor_T dot(const Vec2D& k) const { return x * k.x + y * k.y; } //内积
     
     Vec2D genVert(void) const { return Vec2D(y, -x); }
 	
-	Vec2D unit(void) const; //单位化
+	Vec2D unit(void) const //单位化
+	{
+		Coor_T s = len();
+		return *(this) / (s < Constant::EPS ? 1 : s);
+	}
 	
 	inline static Vec2D rand(void);	
 };

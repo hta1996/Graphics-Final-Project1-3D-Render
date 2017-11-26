@@ -1,11 +1,5 @@
 #include "vector2D.h"
 
-Vec2D Vec2D::unit(void) const
-{
-	Vec2D::Coor_T len = mod();
-	return *(this) / (len < Constant::EPS ? 1 : len);
-}
-
 
 
 inline std::ostream& operator << (std::ostream& out, const Vec2D& x)
@@ -20,7 +14,7 @@ inline Vec2D Vec2D::rand(void)
 	{
 		v.x = Constant::randD();
 		v.y = Constant::randD();
-		if (v.mod2() > Constant::EPS) break;
+		if (v.len2() > Constant::EPS) break;
 	}
     return v.unit();
 }

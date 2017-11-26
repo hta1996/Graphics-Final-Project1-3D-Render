@@ -4,12 +4,14 @@ include_directories(.)
 
 add_subdirectory(util)
 
-#add_subdirectory(light)
+#add_subdirectory(collision)
 
-#add_subdirectory(object)
+add_subdirectory(light)
 
-#add_subdirectory(scene)
+add_subdirectory(object)
 
-#add_subdirectory(engine)
+add_subdirectory(scene)
 
-#add_subdirectory(main)
+add_subdirectory(engine)
+
+add_subdirectory(main)

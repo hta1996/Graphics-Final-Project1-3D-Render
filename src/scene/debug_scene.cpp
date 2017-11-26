@@ -1,6 +1,7 @@
 //#include "color.h"
-#include "Vector3D.h"
-#include "constant.h"
+#include "util/vector3D.h"
+#include "util/constant.h"
+#include "camera.h"
 
 //Color a;
 struct node
@@ -19,10 +20,17 @@ struct node
 	}
 };
 
-Vec3D tmp;  
+Vec3D tmp;
 
 int main(void)
 {
+	//int *a = new int [10];
+	int a[10];
+	for (auto &x: a) x = 7;
+	for (auto x: a)
+	{ 
+		std::cout << x << std::endl;
+	}
 	//Color::Col_T t = 0.5;
 	node tt;
 	int s = 11; 
@@ -35,5 +43,10 @@ int main(void)
 	//td::cout << tt.x << std::endl;
 //std::cout << (a * 10).r << std::endl;
 	//std::cout << (1LL << 60) << std::endl;
+
+	Vec3D eye(0, 0, -1), vp(0, 0, 1), up(0, 1, 0);
+	Camera camera(eye, vp, up, 100, 100, 45);
+	std::cout << camera.emit(60, 60) << std::endl;
+
 	return 0;
 }

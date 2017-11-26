@@ -1,16 +1,14 @@
 #ifndef CONST_H
 #define CONST_H
-#include <cmath>
-#include <cstdlib>
-#include <algorithm>
-#include <iostream>
+#include "heads.h"
 
 namespace Constant
 {
-	typedef unsigned long long uint64;
-	typedef long long int64;
-	typedef double data_type;
-	typedef double other_data;
+
+	const double RT_THERASHOLD = 0.01;
+	const double OUTPUT_PT = 600;
+	const int RT_MAXDEP = 20;
+
 
 	const double EPS = 1e-6;
 	const double PI = std::acos(-1.0);
@@ -32,7 +30,7 @@ namespace Constant
 			return (((((0LL + rand() << 15) | rand()) << 15) | rand()) << 15) | rand();
 		#endif
 	}
-	
+	inline int64 gen(void) { static int64 s = 0; return ++s; }
 	inline double randD(void) // [0,1]
 	{
 		#ifdef __linux__
