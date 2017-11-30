@@ -1,0 +1,1 @@
+../engine/libengine.a ../scene/libscene.a ../object/libobject.a ../light/liblight.a ../scene/libscene.a ../object/libobject.a ../light/liblight.a ../utility/libutility.a ../../external/yamlcpp/libyaml-cpp.a -lpthread 

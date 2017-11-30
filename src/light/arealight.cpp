@@ -1,4 +1,40 @@
 #include "arealight.h"
+#include "scene/scene.h"
+
+
+data_type ALight::getSR(const Scene* scene, const Vec3D& p) const
+{
+    int samples = Constant::SHADOW_SAMPLES, ret = samples * samples;
+    for (int i = 0; i < samples; i++)
+        for (int j = 0; j < samples; j++)
+        {
+            data_type x = (i + 0.5) * 2 / samples - 1, y = (j + 0.5) * 2 / samples - 1;
+            Vec3D c = o + dx * x + dy * y, dir = c - p; data_type dis = dir.len();
+            for (auto o : scene->getO())
+            {
+                Collision co = o->collide(Ray(p, dir));
+                if (co.isHit() && co.t + EPS < dis) { ret--; break; }
+            }
+
+        }
+    return 1.0 * ret / samples / samples;
+}
+
+
+/*
+
+
+
+friend void operator >> (const YAML::Node& x, ALight &y)
+{
+    x["name"] >> y.name;
+    x["color"] >> y.c;
+    x["n"] >> y.n;
+    x["dx"] >> y.dx;
+    x["dy"] >> y.dy;
+    x["power"] >> y.power;
+}*/
+
 /*#include "common/const.h"
 #include "light/rectlight.h"
 #include "object/object.h"

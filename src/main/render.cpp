@@ -1,7 +1,6 @@
-#include "util/constant.h"
-#include "scene/scene.h"
-#include <string>
-using namespace std;
+#include "engine/raytracer/raytracer.h"
+#include <fstream>
+#include <iostream>
 
 void showUsage(void)
 {
@@ -34,12 +33,12 @@ int main(int argc, char *argv[])
 	if (string(argv[1]).substr(0, 3) == "--d") do_debug();
 
 	if (argc > 1) sceneFile = argv[1];
-	for (int i = 0; i < argc; i++)
+/*	for (int i = 0; i < argc; i++)
 	{
 		auto x = argv[i];
 		if (!x) { printf ("%d???\n", i); continue; }
 		printf ("%d %s\n", i, x);
-	}
+	}*/
 	for (int i = 2; i < argc; i++)
 	{
 		string x = string(argv[i]);
@@ -53,20 +52,27 @@ int main(int argc, char *argv[])
 		else if (x.substr(0, 3) == string("--h")) showUsage();
 	}
 	if (!sceneFile.length() || !outFile.length()) showUsage();
-	
-	/*
+
+	std::ifstream fin(sceneFile);
+	if (!fin) cout << "Error" << endl << std::flush;
+
 	srand(time(0));
 	Engine *engine;
-	Scene *scene = Scene::loadFrom(sceneFile);
+	Scene *scene = new Scene (sceneFile);
+
+	//fin(outFile);
+	//cout << fin  << endl;
+
 	switch(engine_id)
 	{
 		case 0: engine = new RayTracer(scene); break;
-		case 1: engine = new PM(scene); break;
-		case 2: engine = new PPM(scene); break;
-		case 3: engine = new SPPM(scene); break;
+		//case 1: engine = new PM(scene); break;
+		//case 2: engine = new PPM(scene); break;
+		//case 3: engine = new SPPM(scene); break;
 	}
     engine->run(outFile);
     if (scene) delete scene;
-    delete engine;*/
+    delete engine;
+    //*/
 	return 0;
 }

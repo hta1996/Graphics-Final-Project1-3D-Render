@@ -1,4 +1,55 @@
-#include "scene.h"
+#include "scene/scene.h"
+#include "object/object_all.h"
+#include "light/light_all.h"
+
+Scene::Scene(Camera *camera, const Color& ambient) : camera(camera), ambient(ambient) { /*init();*/ }
+Scene::Scene(string sceneFile) : sceneFile(sceneFile)
+{
+    YAML::Node file = YAML::LoadFile(sceneFile);
+    file["name"] >> name;
+    file["ambient"] >> ambient;
+
+    /*cout << name << endl;
+    cout << ambient << endl;
+    cout << file["lights"] << endl;
+    cout << file["objects"][0] << endl;*/
+    camera = new Camera;
+    file["camera"] >> *camera;
+
+    cout << *camera << endl;
+
+    //cout << file["lights"] << endl;
+    for (auto x : file["lights"])
+    {
+        //cout << x["AreaLight"] << endl;
+        if (x["AreaLight"]) addL(new ALight(x["AreaLight"]));
+
+        /*
+        else if (x["PointLight"])
+        {
+            PLight *l = new ALight;
+            x["AreaLight"] >> *l;
+            addL(l);
+        }*/
+    }
+    //cout << lights.size() << ' '  << objects.size() << endl;
+    for (auto x : file["objects"])
+    {
+        //cout << x << endl;
+        if (x["Plane"]) addO(new Plane(x["Plane"]));
+        else if (x["Sphere"]) addO(new Sphere(x["Sphere"]));
+    }
+    //cout << lights.size() << ' '  << objects.size() << endl;
+}
+
+
+Scene::~Scene()
+{
+    if (camera) delete camera;
+    for (auto x : lights) delete x;
+    for (auto x : objects) delete x;
+    lights.clear(), objects.clear();
+}
 
 /*
 
@@ -31,7 +82,7 @@ Scene::Scene(const Json::Value& scene)
 */
 
 
- /*
+ 
 Collision Scene::findC(const Ray& ray) const
 {
    
@@ -39,16 +90,16 @@ Collision Scene::findC(const Ray& ray) const
     for (auto x : lights)
     {
         Collision s = x->collide(ray);
-        if (coll.isHit() && coll.dist + Const::EPS < ret.dist) ret = coll;
+        if (s.isHit() && s.t + EPS < ret.t) ret = s;
     }
-    for (auto o : m_objects)
+    for (auto o : objects)
     {
-        Collision coll = o->collide(ray);
-        if (coll.isHit() && coll.dist + Const::EPS < ret.dist) ret = coll;
+        Collision s = o->collide(ray);
+        if (s.isHit() && s.t + EPS < ret.t) ret = s;
     }
     return ret;
 }
-*/
+
 /*
 void Scene::save(const string& file) const
 {

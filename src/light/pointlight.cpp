@@ -1,4 +1,18 @@
 #include "pointlight.h"
+#include "scene/scene.h"
+
+data_type PLight::getSR(const Scene* scene, const Vec3D& p) const
+{
+    Vec3D dir = o - p; data_type dis = dir.len();
+    for (auto o : scene->getO())
+    {
+        Collision co = o->collide(Ray(p, dir));
+        if (co.isHit() && co.t + EPS < dis) return 0;
+    }
+    return 1;
+}
+
+
 /*
 #include "common/const.h"
 

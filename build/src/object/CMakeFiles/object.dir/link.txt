@@ -1,0 +1,2 @@
+C:/cygwin64/bin/ar.exe qc libobject.a  CMakeFiles/object.dir/collision.cpp.obj CMakeFiles/object.dir/material.cpp.obj CMakeFiles/object.dir/object.cpp.obj CMakeFiles/object.dir/plane.cpp.obj CMakeFiles/object.dir/sphere.cpp.obj
+C:/cygwin64/bin/ranlib.exe libobject.a

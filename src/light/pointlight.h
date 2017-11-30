@@ -7,9 +7,12 @@
 class PLight : public Light
 {
 public:
+    PLight(){}
     PLight(const Color& c, const Vec3D& o, data_type power = 1) : Light(c, power), o(o) {}
 
     virtual Vec3D getS(void) const override { return o; }
+
+    virtual data_type getSR(const Scene* scene, const Vec3D& p) const override;
     
     virtual Collision collide(const Ray& ray) const override
     {

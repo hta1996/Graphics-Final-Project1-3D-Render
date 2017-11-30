@@ -3,6 +3,15 @@ using Constant::OUTPUT_PT;
 using Constant::RT_THERASHOLD;
 using Constant::RT_MAXDEP;
 
+RayTracer::RayTracer(Scene* scene): Engine(scene)
+{
+    if (!scene) return ;
+}
+RayTracer::~RayTracer()
+{
+    if (!scene) return ;
+}
+
 inline double gettime(clock_t x)
 {
     double s = 1.0 * (clock() - x) / CLOCKS_PER_SEC;
@@ -13,7 +22,7 @@ void RayTracer::run(const string& outFile)
 {
     if (!scene) return;
     cout << "The Ray tracing starts!" << endl;
-    clock_t lastr = clock();
+    clock_t lastr = clock(), bts = clock();
     for (int i = 0; i < w; i++)
     {
     	clock_t tbi = clock();
@@ -21,33 +30,24 @@ void RayTracer::run(const string& outFile)
     	for (int j = 0; j < h; j++)
     	{
     		y = j;
-            //camera->setc(i, j, GetPixel(i, j));    		
+            // 1333 357
+           // if (i == 860 && j == 730)
+            {
+                camera->setC(i, j, getPixel(i, j));   
+               // cout << camera->getC(i, j) << endl;
+            }
+            //if (i == 0 && j == 20) return ;
     	}
-        cout << "Ray tracing: column " << i << ' ' <<  gettime(tbi) << endl;
+        //cout << "Ray tracing: column " << i << ' ' <<  gettime(tbi) << endl;
         if (OUTPUT_PT > 0 && clock() - lastr > OUTPUT_PT * CLOCKS_PER_SEC)
-            camera->save(outFile), lastr = clock();
+            camera->cache(outFile), lastr = clock();
     }
+    cout << "Total Tracing Time: " << gettime(bts) << endl; bts = clock();
+    camera->save(outFile);
+    cout << "Total Saving Time: " << gettime(bts) << endl;
+
 
 /*
-    clock_t lastRefreshTime = clock();
-    for (int i = 0; i < m_w; i++)
-    {
-        for (int j = 0; j < m_h; j++)
-        {
-            if (!j) cout << "Ray tracing: column " << i << endl;
-            m_pixel_x = i, m_pixel_y = j;
-            m_hash[i][j] = 0;
-            m_camera->setColor(i, j, m_DOFSamplingColor(i, j));
-        }
-        if (Config::output_refresh_interval > 0 &&
-            clock() - lastRefreshTime > Config::output_refresh_interval * CLOCKS_PER_SEC)
-        {
-            lastRefreshTime = clock();
-            m_camera->print(outFile.c_str());
-        }
-    }
-
-    m_camera->print(outFile.c_str());
     
 
     if (Config::anti_aliasing_samples)
@@ -103,95 +103,100 @@ void RayTracer::run(const string& outFile)
         m_camera->print(outFile.c_str());
     }*/
 }
-/*
+
 Color RayTracer::getPixel(data_type xx, data_type yy, data_type factor) const
 {
     return rayTrace(camera->emit(xx, yy), Color(1, 1, 1) * factor, 1, 1);
 }
 
-Color RayTracer::rayTracing(const Ray& ray, const Color& factor, data_type weight, int depth) const
+Color RayTracer::getlocal(const Collision& co, const Material* com, const Color& factor) const
+{
+    Color c = com->c.mul(co.o->getT(co));      //注意纹理和颜色中必有一个全部都是1
+    Color ret = c.mul(scene->getA()) * com->fd; //环境光
+    for (auto x : scene->getL()) //所有的光
+    {
+        Vec3D l = (x->getS() - co.p).unit();
+        if (l.dot(co.n) < EPS) continue; //光几乎和物体相切
+
+        //阴影
+        data_type shade = x->getSR(scene, co.p);
+        if (shade > EPS)
+            ret += c.mul(x->getC() * (com->BRDF(l, co.n, co.r.d) * shade));
+    }
+    return ret.mul(factor);
+}
+
+Color RayTracer::rayTrace(const Ray& ray, const Color& factor, data_type weight, int depth) const
 {
     if (weight < Constant::RT_THERASHOLD || depth > Constant::RT_MAXDEP)
         return Color();
+    //cout <<"Begin   "<< ray << ' ' << factor << ' '  << weight << ' ' << depth << endl;
     Collision co = scene->findC(ray);
-    if (!coll.)
-}
-
-Color RayTracer::m_rayTracing(const Ray& ray, const Color& factor, double weight, int depth) const
-{
-    if (weight < Config::raytracing_min_weight || depth > Config::raytracing_max_depth)
-        return Color();
-
-    Collision coll = m_scene->findNearestCollision(ray);
-    if (!coll.isHit())
-        return m_scene->getAmbientLightColor() * factor;
-    else if (coll.atLight())
+    if (!co.isHit())
     {
-        (m_hash[m_pixel_x][m_pixel_y] *= Const::HASH_BASE) += coll.object_identifier;
-        return coll.light->getColor() * factor;
+        //cout << "1" << ' ' << scene->getA().mul(factor) << endl;
+        return scene->getA().mul(factor); //环境光
     }
-    else
+    else if (co.atL())
     {
-        Color ret, absorb(1, 1, 1);
-        const Object* obj = coll.object;
-        const Material* material = obj->getMaterial();
-        (m_hash[m_pixel_x][m_pixel_y] *= Const::HASH_BASE) += coll.object_identifier;
+        //cout << "2" << ' ' << co.l->getC().mul(factor) << endl;
+        return co.l->getC().mul(factor); //击中光源
+    }
+    else //考虑物体的情况
+    {
+        //cout << "3" << endl;
+        Color ret(0, 0, 0), absorb(1, 1, 1);
+        depth++;
+        const Object *x = co.o;
+        const Material *m = x->getM();
 
-        // 透明材质的颜色过滤
-        if (coll.is_internal) absorb = (material->absorb_color * -coll.dist).exp();
+        //光线在物体内部会有颜色损失
+        if (co.in) absorb = (m->ac * -co.t).exp();
 
-        if (material->diff > Const::EPS || material->spec > Const::EPS)
-            ret += m_calcLocalIllumination(coll, material, factor * absorb);
-        if (material->refl > Const::EPS || material->refr > Const::EPS)
+        //源自光源的漫反射
+        if (m->fd > EPS || m->fs > EPS) ret += getlocal(co, m, factor.mul(absorb));
+
+       // cout <<1 << ' ' << absorb << ' ' << factor << ' ' << ret << ' ' << x->getN() << endl;
+      //  cout << "2 " << m->fl << ' ' << m->fr << endl;
+
+        if (m->fl > EPS || m->fr > EPS)
         {
-            double n = material->rindex;
-            if (coll.is_internal) n = 1 / n;
-            Vector3 refl = coll.ray.dir.reflect(coll.n);
-            Vector3 refr = coll.ray.dir.refract(coll.n, n);
-            if (material->refr < Const::EPS) // 全镜面反射
-                ret += m_rayTracing(Ray(coll.p, refl), factor * absorb * (material->color * material->refl),
-                                    weight * material->refl, depth + 1);
-            else if (refr.mod2() < Const::EPS) // 全反射
+            data_type n = co.in ? 1 / m->ri : m->ri, fl = m->fl, fr = m->fr;
+            Vec3D vfl = co.r.d.reflect(co.n), vfr = co.r.d.refract(co.n, n);
+
+        //   cout << "3 " << n << ' ' << vfl << ' ' << vfr << endl;
+
+            if (fr < EPS) //全镜面反射
+                ret += rayTrace(Ray(co.p, vfl), factor.mul(absorb.mul(m->c) * fl), weight * fl, depth);
+            else if (vfr.len2() < EPS) //全反射
             {
-                double k = material->refl + material->refr;
-                ret += m_rayTracing(Ray(coll.p, refl),
-                                    factor * absorb * (material->color * k),
-                                    weight * k, depth + 1);
+                data_type k = m->fl + m->fr;
+                ret += rayTrace(Ray(co.p, vfl), factor.mul(absorb.mul(m->c) * k), weight * k, depth);
             }
-            else if (material->refl < Const::EPS) // 全透射
-                ret += m_rayTracing(Ray(coll.p, refr), factor * absorb * material->refr,
-                                    weight * material->refr, depth + 1);
+            else if (fl < EPS) //全透明材料
+                ret += rayTrace(Ray(co.p, vfr), factor.mul(absorb.mul(m->c) * fr), weight * fr, depth);
             else
             {
-                double kl = material->refl, kr = material->refr;
-                if (Config::enable_fresnel) // Fresnel equations
-                {
-                    double cosI = -coll.ray.dir.dot(coll.n), cosT = sqrt(1 - (1 - cosI * cosI) / n / n);
-                    double r1 = (cosI * n - cosT) / (cosI * n + cosT),
-                           r2 = (cosI - cosT * n) / (cosI + cosT * n);
-                    kl = (r1 * r1 + r2 * r2) / 2, kr = 1 - kl;
-                }
-
-                if (kl > Const::EPS) ret += m_rayTracing(Ray(coll.p, refl), factor * absorb * (material->color * kl),
-                                                         weight * kl, depth + 1);
-                if (kr > Const::EPS) ret += m_rayTracing(Ray(coll.p, refr), factor * absorb * kr,
-                                                         weight * kr, depth + 1);
+                if (fl > EPS)
+                    ret += rayTrace(Ray(co.p, vfl), factor.mul(absorb.mul(m->c) * fl), weight * fl, depth);
+                if (fr > EPS)
+                    ret += rayTrace(Ray(co.p, vfr), factor.mul(absorb.mul(m->c) * fr), weight * fr, depth);
             }
         }
-
         return ret;
     }
 }
-
+/*
+           
 
 Color RayTracer::m_DOFSamplingColor(double ox, double oy, double factor) const
 {
     if (!m_camera->enableDOF())
-        return m_rayTracing(m_camera->emit(ox, oy), Color(1, 1, 1) * factor, 1, 1);
+        return m_rayTrace(m_camera->emit(ox, oy), Color(1, 1, 1) * factor, 1, 1);
 
     Color color;
     for (int i = 0; i < Config::depth_of_field_samples; i++)
-        color += m_rayTracing(m_camera->dofEmit(ox, oy), Color(1, 1, 1) * factor / Config::depth_of_field_samples, 1, 1);
+        color += m_rayTrace(m_camera->dofEmit(ox, oy), Color(1, 1, 1) * factor / Config::depth_of_field_samples, 1, 1);
     return color;
 }
 
@@ -221,85 +226,4 @@ Color RayTracer::m_AASamplingColor(int ox, int oy)
     return color;
 }
 
-Color RayTracer::m_calcLocalIllumination(const Collision& coll, const Material* material, const Color& factor) const
-{
-    Color color = material->color * coll.object->getTextureColor(coll);
-    Color ret = color * m_scene->getAmbientLightColor() * material->diff; // 环境光
-    for (auto light = m_scene->lightsBegin(); light != m_scene->lightsEnd(); light++)
-    {
-        Vector3 l = ((*light)->getSource() - coll.p).unitize();
-        if (l.dot(coll.n) < Const::EPS) continue;
-
-        double shade = (*light)->getShadowRatio(m_scene, coll.p);
-        if (shade > Const::EPS)
-            ret += color * (*light)->getColor() * material->BRDF(l, coll.n, coll.ray.dir) * shade;
-    }
-    return ret * factor;
-}
-
-Color RayTracer::m_rayTracing(const Ray& ray, const Color& factor, double weight, int depth) const
-{
-    if (weight < Config::raytracing_min_weight || depth > Config::raytracing_max_depth)
-        return Color();
-
-    Collision coll = m_scene->findNearestCollision(ray);
-    if (!coll.isHit())
-        return m_scene->getAmbientLightColor() * factor;
-    else if (coll.atLight())
-    {
-        (m_hash[m_pixel_x][m_pixel_y] *= Const::HASH_BASE) += coll.object_identifier;
-        return coll.light->getColor() * factor;
-    }
-    else
-    {
-        Color ret, absorb(1, 1, 1);
-        const Object* obj = coll.object;
-        const Material* material = obj->getMaterial();
-        (m_hash[m_pixel_x][m_pixel_y] *= Const::HASH_BASE) += coll.object_identifier;
-
-        // 透明材质的颜色过滤
-        if (coll.is_internal) absorb = (material->absorb_color * -coll.dist).exp();
-
-        if (material->diff > Const::EPS || material->spec > Const::EPS)
-            ret += m_calcLocalIllumination(coll, material, factor * absorb);
-        if (material->refl > Const::EPS || material->refr > Const::EPS)
-        {
-            double n = material->rindex;
-            if (coll.is_internal) n = 1 / n;
-            Vector3 refl = coll.ray.dir.reflect(coll.n);
-            Vector3 refr = coll.ray.dir.refract(coll.n, n);
-            if (material->refr < Const::EPS) // 全镜面反射
-                ret += m_rayTracing(Ray(coll.p, refl), factor * absorb * (material->color * material->refl),
-                                    weight * material->refl, depth + 1);
-            else if (refr.mod2() < Const::EPS) // 全反射
-            {
-                double k = material->refl + material->refr;
-                ret += m_rayTracing(Ray(coll.p, refl),
-                                    factor * absorb * (material->color * k),
-                                    weight * k, depth + 1);
-            }
-            else if (material->refl < Const::EPS) // 全透射
-                ret += m_rayTracing(Ray(coll.p, refr), factor * absorb * material->refr,
-                                    weight * material->refr, depth + 1);
-            else
-            {
-                double kl = material->refl, kr = material->refr;
-                if (Config::enable_fresnel) // Fresnel equations
-                {
-                    double cosI = -coll.ray.dir.dot(coll.n), cosT = sqrt(1 - (1 - cosI * cosI) / n / n);
-                    double r1 = (cosI * n - cosT) / (cosI * n + cosT),
-                           r2 = (cosI - cosT * n) / (cosI + cosT * n);
-                    kl = (r1 * r1 + r2 * r2) / 2, kr = 1 - kl;
-                }
-
-                if (kl > Const::EPS) ret += m_rayTracing(Ray(coll.p, refl), factor * absorb * (material->color * kl),
-                                                         weight * kl, depth + 1);
-                if (kr > Const::EPS) ret += m_rayTracing(Ray(coll.p, refr), factor * absorb * kr,
-                                                         weight * kr, depth + 1);
-            }
-        }
-
-        return ret;
-    }
-}
 */

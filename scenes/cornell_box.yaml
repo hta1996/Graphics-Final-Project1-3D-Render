@@ -1,0 +1,82 @@
+name : cornell_box               #场景名称
+ambient : [0.05, 0.05, 0.05]       #环境光
+camera:                          #相机类
+   eye : [0, -3, 0.8]
+   viewpoint : [0, 0, 0.8]
+   fovy : 45
+   h : 1080
+   w : 1350
+   up : [0, 0, 1]
+
+lights:                           #光源
+   -  AreaLight:
+         name : Top Light
+         color : [1, 1, 1]
+         o : [0, 0, 1.6]
+         n : [0, 0, -1]
+         dx : [0.25, 0, 0]
+         dy : [0, 0.25, 0]
+         power : 6
+objects:                          #物体
+   - Plane:
+      name: Floor
+      material : 
+         color : [1, 1, 1]
+         diffuse : 0.9
+         mirror : 0
+      n : [0, 0, 1]
+      o : [0, 0, 0]
+   - Plane:
+      name : Ceil
+      material : 
+         color : [1, 1, 1]
+         diffuse : 0.9
+         mirror : 0
+      n : [0, 0, -1]
+      o : [0, 0, 1.6]
+   - Plane:
+      name : Left
+      material : 
+         color : [1, 0.5, 0.5]
+         diffuse : 0.9
+         mirror : 0
+      n : [1, 0, 0]
+      o : [-1, 0, 0]
+   - Plane:
+      name : Right
+      material : 
+         color : [0.5, 0.5, 1.0]
+         diffuse : 0.9
+         mirror : 0
+      n : [-1, 0, 0]
+      o : [1, 0, 0]
+   - Plane:
+      name : Front
+      material : 
+         color : [1, 1, 1]
+         diffuse : 0.9
+         mirror : 0
+      n : [0, -1, 0]
+      o : [0, 1, 0]
+   - Sphere:
+      name : Left Sphere
+      material : 
+         absorb_color : [0, 0, 0]
+         color : [1, 1, 1]
+         diffuse : 0
+         reflect : 0.95
+         refraction : 0
+         mirror : 0.01
+      o : [-0.43, 0.27, 0.33]
+      r : 0.33
+   - Sphere:
+      name : Right Sphere
+      material : 
+         color : [1, 1, 1]
+         diffuse : 0
+         reflect : 0.5
+         refraction : 0.5
+         refract_index : 1.5
+         mirror : 0
+      o : [0.43, -0.37, 0.33]
+      r : 0.33

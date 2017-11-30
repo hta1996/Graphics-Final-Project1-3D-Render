@@ -1,33 +1,31 @@
 #ifndef SCENE_H
 #define SCENE_H
 
+//#include "utility/utility.h"
 #include "light/light.h"
 #include "object/object.h"
-#include "camera.h"
+#include "scene/camera.h"
 
 class Scene
 {
 public:
-	Scene(Camera *camera, const Color& ambient = Color()) : camera(camera), ambient(ambient) { /*init();*/ }
+	Scene(){}
+	Scene(Camera *camera, const Color& ambient = Color());
+	Scene(string sceneFile);
 
-	~Scene()
-	{
-		if (camera) delete camera;
-		for (auto x : lights) delete x;
-		for (auto x : objects) delete x;
-		lights.clear(), objects.clear();
-	}
+	~Scene();
+	
+	Camera* getC(void) const { return camera; }
+	Color getA(void) const { return ambient; }
+	Light* getL(const int& x) const { return lights[x]; }
+	Object* getO(const int& x) const { return objects[x]; }
+	const auto& getL(void) const { return lights; }
+	const auto& getO(void) const { return objects; }
 
-	Camera* getc(void) const { return camera; }
-	Color geta(void) const { return ambient; }
-	Light* getl(const int& x) const { return lights[x]; }
-	Object* geto(const int& x) const { return objects[x]; }
-	const auto getl(void) const { return lights; }
-	const auto geto(void) const { return objects; }	
 
-	void addl(Light* x) { lights.push_back(x); }
-	void addo(Object* x) { objects.push_back(x); }
-	//Collision findC(const Ray& ray) const; //找第一次碰撞
+	void addL(Light* x) { lights.push_back(x); }
+	void addO(Object* x) { objects.push_back(x); }
+	Collision findC(const Ray& ray) const; //找第一次碰撞
 
 
 private: 
@@ -35,9 +33,9 @@ private:
     Color ambient;                      // 环境光
     vector < Light* > lights;           // 光源
     vector < Object* > objects;         // 物体
-
+    string name, sceneFile;                        // 场景的名称
+    
     //static std::string m_scene_file_dir; // 场景文件路径
-
    // void init();
 
 };

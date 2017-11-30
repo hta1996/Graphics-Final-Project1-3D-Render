@@ -1,0 +1,2 @@
+C:/cygwin64/bin/ar.exe qc libutility.a  CMakeFiles/utility.dir/bmp.cpp.obj CMakeFiles/utility.dir/heads.cpp.obj CMakeFiles/utility.dir/vector2D.cpp.obj
+C:/cygwin64/bin/ranlib.exe libutility.a

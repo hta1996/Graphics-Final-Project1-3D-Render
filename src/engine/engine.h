@@ -2,6 +2,10 @@
 #define ENGINE_H
 
 #include "scene/scene.h"
+#include "scene/camera.h"
+
+class Scene;
+class Camera;
 
 class Engine //渲染使用的引擎
 {
@@ -15,15 +19,7 @@ protected:
 	Camera *camera;
 	int w, h;
 
-	Engine(Scene *scene) : scene(scene), camera(NULL), w(0), h(0)
-	{
-		if (scene)
-		{
-			camera = scene->getc();
-			w = camera->getW();
-			h = camera->getH();
-		}
-	}
+	Engine(Scene *scene);
 };
 
 #endif
